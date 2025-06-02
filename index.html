@@ -49,25 +49,24 @@
     
     <script>
         function jumpToGoogle() {
+            // 检测是否在微信浏览器中
+            const isWeChat = /micromessenger/i.test(navigator.userAgent);
             // 检测是否为移动设备
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            if (isMobile) {
+            if (isWeChat) {
+                // 在微信中，显示提示让用户手动复制链接
+                showWeChatTip();
+            } else if (isMobile) {
                 // 移动设备：尝试打开系统默认浏览器
                 const userAgent = navigator.userAgent;
                 
                 if (/iPhone|iPad|iPod/i.test(userAgent)) {
-                    // iOS设备 - 使用Safari浏览器打开
+                    // iOS设备
                     window.location.href = 'https://www.google.com';
                 } else if (/Android/i.test(userAgent)) {
-                    // Android设备 - 尝试打开系统浏览器
-                    try {
-                        // 首先尝试直接跳转，这会使用系统默认浏览器
-                        window.location.href = 'https://www.google.com';
-                    } catch (e) {
-                        // 备用方案
-                        window.open('https://www.google.com', '_system', 'location=yes');
-                    }
+                    // Android设备
+                    window.location.href = 'https://www.google.com';
                 } else {
                     // 其他移动设备
                     window.location.href = 'https://www.google.com';
@@ -76,6 +75,57 @@
                 // 桌面设备：在新标签页打开
                 window.open('https://www.google.com', '_blank');
             }
+        }
+        
+        function showWeChatTip() {
+            // 创建提示遮罩层
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                color: white;
+                font-size: 18px;
+                text-align: center;
+                padding: 20px;
+                box-sizing: border-box;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="background: white; color: #333; padding: 30px; border-radius: 15px; max-width: 300px;">
+                    <h3 style="margin-top: 0; color: #ff6b6b;">检测到微信环境</h3>
+                    <p style="line-height: 1.6; margin: 15px 0;">由于微信限制，请按以下步骤操作：</p>
+                    <ol style="text-align: left; line-height: 1.8; padding-left: 20px;">
+                        <li>点击右上角 "···" 菜单</li>
+                        <li>选择 "在浏览器中打开"</li>
+                        <li>或复制链接到浏览器打开</li>
+                    </ol>
+                    <div style="margin: 20px 0; padding: 10px; background: #f5f5f5; border-radius: 5px; font-family: monospace; word-break: break-all;">
+                        https://www.google.com
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: #ff6b6b; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                        我知道了
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            // 点击遮罩层关闭
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
         }
     </script>
 </body>
