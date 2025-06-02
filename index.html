@@ -49,8 +49,33 @@
     
     <script>
         function jumpToGoogle() {
-            // 在新窗口/标签页中打开Google
-            window.open('https://www.google.com', '_blank');
+            // 检测是否为移动设备
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // 移动设备：尝试打开系统默认浏览器
+                const userAgent = navigator.userAgent;
+                
+                if (/iPhone|iPad|iPod/i.test(userAgent)) {
+                    // iOS设备 - 使用Safari浏览器打开
+                    window.location.href = 'https://www.google.com';
+                } else if (/Android/i.test(userAgent)) {
+                    // Android设备 - 尝试打开系统浏览器
+                    try {
+                        // 首先尝试直接跳转，这会使用系统默认浏览器
+                        window.location.href = 'https://www.google.com';
+                    } catch (e) {
+                        // 备用方案
+                        window.open('https://www.google.com', '_system', 'location=yes');
+                    }
+                } else {
+                    // 其他移动设备
+                    window.location.href = 'https://www.google.com';
+                }
+            } else {
+                // 桌面设备：在新标签页打开
+                window.open('https://www.google.com', '_blank');
+            }
         }
     </script>
 </body>
